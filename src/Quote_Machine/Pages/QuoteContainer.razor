@@ -26,11 +26,9 @@
     {
         try
         {
-            Console.WriteLine("Trying audioData!");
-
-            await speechService.TextToAudio(Quote.Content, "en-US");
-            //string audioDataURL = $"data:audio/wav;base64,{Convert.ToBase64String(audioData)}";
-            //await JsRuntime.InvokeVoidAsync("playAudio", audioDataURL);
+            byte[] audioData = await speechService.TextToAudio(Quote.Content, "en-US");
+            string audioDataURL = $"data:audio/wav;base64,{Convert.ToBase64String(audioData)}";
+            await JsRuntime.InvokeVoidAsync("playAudio", audioDataURL);
         }
         catch (Exception ex)
         {

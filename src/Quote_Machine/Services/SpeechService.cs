@@ -4,12 +4,12 @@ namespace Quote_Machine.Services;
 
 public interface ISpeechService
 {
-    Task TextToAudio(string content, string language);
+    Task<byte[]> TextToAudio(string content, string language);
 }
 
 public class SpeechService : ISpeechService
 {
-    public async Task TextToAudio(string content, string language)
+    public async Task<byte[]> TextToAudio(string content, string language)
     {
         Console.WriteLine("Running speechService!");
         var config = SpeechConfig.FromSubscription("38830a593e654f93811c1e23624f8a4e", "norwayeast");
@@ -22,7 +22,11 @@ public class SpeechService : ISpeechService
 
         if (result.Reason == ResultReason.SynthesizingAudioCompleted)
         {
-            Console.WriteLine("Finished speechService!");
+            return result.AudioData;
+        }
+        else
+        {
+            throw new Exception("Failed to synthesize the text to audio");
         }
     }
 }

@@ -31,6 +31,24 @@
     </div>
 
     <script src="_framework/blazor.server.js"></script>
+    <script>
+        let currentAudio = null;
+
+        window.playAudio = (audioDataURL) => {
+            // If there's a currently playing audio, stop it and remove the reference
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+                currentAudio = null;
+            }
+
+            // Create a new Audio instance and start playing it
+            currentAudio = new Audio(audioDataURL);
+            currentAudio.play();
+        };
+    </script>
+
+
 </body>
 
 </html>
