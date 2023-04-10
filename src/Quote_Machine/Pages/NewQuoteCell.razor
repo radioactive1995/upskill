@@ -1,0 +1,19 @@
+﻿
+    <EditForm Model="@NewQuote" class="row" OnValidSubmit="async () =>
+{
+    await OnQuoteSubmitHandler.InvokeAsync(NewQuote);
+    NewQuote = new();
+}">
+        <DataAnnotationsValidator />
+        <InputText @bind-Value="NewQuote.Content" placeholder="Content" class="col-7" />
+        <InputText @bind-Value="NewQuote.Author" placeholder="Author" class="col-3" />
+        <button class="btn btn-primary col-2">Create</button>
+        <ValidationSummary />
+    </EditForm>
+
+@code {
+    public QuoteDto NewQuote { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<QuoteDto> OnQuoteSubmitHandler { get; set; }
+}

@@ -1,0 +1,37 @@
+﻿<tr>
+    <td>@Quote.Id</td>
+    <td>
+        <input value="@Quote.Content" minlength="1" class="form-control"
+               @onchange="async (e) => 
+                { 
+                    if (string.IsNullOrEmpty(e?.Value?.ToString()!)) return;
+
+                    Quote.Content = e?.Value?.ToString()!;
+                    await OnQuoteChangeHandler.InvokeAsync(Quote); 
+                }" />
+    </td>
+    <td>
+        <input value="@Quote.Author" minlength="1" class="form-control" 
+               @onchange="async (e) => 
+                { 
+                    if (string.IsNullOrEmpty(e?.Value?.ToString()!)) return;
+
+                    Quote.Author = e?.Value?.ToString()!;
+                    await OnQuoteChangeHandler.InvokeAsync(Quote); 
+                }" />
+    </td>
+    <td><button class="btn btn-danger" onclick="@(async () => OnQuoteDeleteHandler.InvokeAsync(Quote))">Delete</button></td>
+</tr>
+
+@code {
+
+    [Parameter]
+    public Quote Quote { get; set; }
+
+    [Parameter]
+    public EventCallback<Quote> OnQuoteChangeHandler { get; set; }
+
+    [Parameter]
+    public EventCallback<Quote> OnQuoteDeleteHandler { get; set; }
+
+}

@@ -1,0 +1,69 @@
+﻿@inject ISpeechService speechService;
+@inject IJSRuntime JsRuntime
+
+<div class="col vh-100 vw-100 d-flex justify-content-center align-items-center">
+    <div class="border border-2 pt-5 bg-success quote-box rounded rounded-1 p-5">
+        <div class="mb-4 text-center text-white">
+            <p class="h2 icon quote">@Quote.Content</p>
+            <p class="text-end pt-2 lead">- @Quote.Author</p>
+        </div>
+        <div class="d-flex flex-row buttons justify-content-between text-white">
+            <button class="btn btn-light text-success" id="play" onclick="@PlayQuoteAudio">Play</button>
+            <button onclick="@(async () => NewQuoteClickedEventHandler.InvokeAsync())" class="btn btn-light text-success">New quote</button>
+        </div>
+    </div>
+</div>
+
+@code 
+{
+    [Parameter]
+    public Quote Quote { get; set; }
+
+    [Parameter]
+    public EventCallback NewQuoteClickedEventHandler { get; set; }
+
+    private async Task PlayQuoteAudio()
+    {
+        try
+        {
+            Console.WriteLine("Trying audioData!");
+
+            await speechService.TextToAudio(Quote.Content, "en-US");
+            //string audioDataURL = $"data:audio/wav;base64,{Convert.ToBase64String(audioData)}";
+            //await JsRuntime.InvokeVoidAsync("playAudio", audioDataURL);
+        }
+        catch (Exception ex)
+        {
+            // Handle the error
+            Console.WriteLine($"Error playing audio: {ex.Message}");
+        }
+    }
+}
+
+<style>
+    .quote-box {
+        width: 550px;
+        min-height: 270px;
+        height: auto;
+    }
+
+    .icon::before {
+        display: inline-block;
+        font-style: normal;
+        font-variant: normal;
+        text-rendering: auto;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .quote::before {
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        content: "\f10d";
+    }
+
+    .quote::after {
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        content: "\f10e";
+    }
+</style>

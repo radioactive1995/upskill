@@ -1,0 +1,59 @@
+﻿@page "/"
+@inject IQuoteService quoteService
+
+<PageTitle>Index</PageTitle>
+
+<div class="container">
+    <div class="row">
+        @if (Quotes.Length is not 0)
+        {
+            <QuoteContainer Quote="CurrentQuote" NewQuoteClickedEventHandler="@NewQuoteClickedEventHandler" />
+        }
+    </div>
+</div>
+
+
+@code {
+    private Random Random => new Random();
+    private Quote[] Quotes { get; set; } = Array.Empty<Quote>();
+    private string Error { get; set; } = string.Empty;
+    private Quote CurrentQuote { get; set; }
+    private Quote RandomQuote => Quotes[Random.Next(0, Quotes.Length)];
+
+
+    private Quote[] ErrorState(string ErrorMessage)
+    {
+        Error = ErrorMessage;
+        this.StateHasChanged();
+        return Array.Empty<Quote>();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Quotes = await quoteService.TryGetQuoteListAsync() switch
+        {
+            (true, var quotes) => quotes,
+            (false, _) => ErrorState("An error occurred when fetching quotes")
+        };
+
+        CurrentQuote = RandomQuote;
+    }
+
+    public void NewQuoteClickedEventHandler()
+    {
+        CurrentQuote = PickRandomQuote(CurrentQuote.Id);
+    }
+
+    private Quote PickRandomQuote(int currentId)
+    {
+        Quote? randomQuote = null;
+
+        do
+        {
+            randomQuote = Quotes[Random.Next(0, Quotes.Length)];
+        }
+        while (currentId == randomQuote.Id);
+
+        return randomQuote;
+    }
+}

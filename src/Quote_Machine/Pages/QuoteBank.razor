@@ -1,0 +1,105 @@
+﻿@page "/bank"
+@inject IQuoteService quoteService
+
+@if (string.IsNullOrEmpty(Error) is false)
+{
+    <div class="alert alert-danger" >
+        @Error
+    </div>
+}
+
+else
+{
+    <div class="container">
+        <div class="row">
+            <div class="col"></div>
+            <div class="col-12 col-lg-7">
+                <table class="table table-bordered">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>@nameof(Quote.Id)</th>
+                            <th>@nameof(Quote.Content)</th>
+                            <th>@nameof(Quote.Author)</th>
+                            <th>Button</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var quote in Quotes)
+                        {
+                            <QuoteCell Quote="quote" OnQuoteChangeHandler="@OnQuoteChangeHandler" OnQuoteDeleteHandler="@OnQuoteDeleteHanlder" />
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="col"></div>
+        </div>
+        <div class="row">
+            <div class="col"></div>
+            <div class="col-10 col-lg-6">
+                <NewQuoteCell OnQuoteSubmitHandler="OnQuoteSubmitHandler" />
+            </div>
+            <div class="col"></div>
+        </div>
+    </div>
+}
+
+
+@code {
+    private Quote[] Quotes { get; set; } = Array.Empty<Quote>();
+    private string Error { get; set; } = string.Empty;
+    private Quote[] ErrorState(string ErrorMessage)
+    {
+        Error = ErrorMessage;
+        this.StateHasChanged();
+        return Array.Empty<Quote>();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Quotes = await LoadDataAsync();
+
+    }
+
+    public async Task OnQuoteChangeHandler(Quote quote)
+    {
+        if (await quoteService.TryUpdateQuoteAsync(quote))
+        {
+            Quotes = await LoadDataAsync();
+            return;
+        }
+
+        Error = "An error occurred when updating a quote cell";
+    }
+
+    public async Task OnQuoteDeleteHanlder(Quote quote)
+    {
+        if (await quoteService.TryDeleteQuoteAsync(quote))
+        {
+            Quotes = await LoadDataAsync();
+            return;
+        }
+
+        Error = "An error occurred when deleting a quote";
+    }
+
+    public async Task OnQuoteSubmitHandler(QuoteDto quoteDto)
+    {
+        if (await quoteService.TryAddQuoteAsync(quoteDto))
+        {
+            Quotes = await LoadDataAsync();
+            return;
+        }
+
+        Error = "An error occurred when adding a new quote";
+    }
+   
+
+
+
+    private async Task<Quote[]> LoadDataAsync()
+    => await quoteService.TryGetQuoteListAsync() switch
+    {
+        (true, var quotes) => quotes,
+        (false, _) => ErrorState("An error occurred when fetching quotes")
+    };
+}
