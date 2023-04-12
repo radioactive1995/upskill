@@ -3,7 +3,16 @@
 
 <PageTitle>Index</PageTitle>
 
-<div class="container">
+@if (string.IsNullOrEmpty(Error) is false)
+{
+    <div class="alert alert-danger" >
+        @Error
+    </div>
+}
+
+else
+{
+    <div class="container">
     <div class="row">
         @if (Quotes.Length is not 0)
         {
@@ -11,13 +20,14 @@
         }
     </div>
 </div>
+}
 
 
 @code {
     private Random Random => new Random();
     private Quote[] Quotes { get; set; } = Array.Empty<Quote>();
     private string Error { get; set; } = string.Empty;
-    private Quote CurrentQuote { get; set; }
+    private Quote? CurrentQuote { get; set; }
     private Quote RandomQuote => Quotes[Random.Next(0, Quotes.Length)];
 
 
@@ -36,7 +46,10 @@
             (false, _) => ErrorState("An error occurred when fetching quotes")
         };
 
-        CurrentQuote = RandomQuote;
+        if (Quotes.Length is not 0)
+        {
+            CurrentQuote = RandomQuote;
+        }
     }
 
     public void NewQuoteClickedEventHandler()
